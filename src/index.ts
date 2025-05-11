@@ -12,7 +12,7 @@ import { getMonthDateToDayNameMap, getCurrentDate } from "./date-helpers.js";
 
 server.tool(
   "createEventPage",
-  "Create an event and return the URL for the event page. This page can be used to coordinate schedules and confirm attendance for events such as drinking parties, company events, outdoor activities, and trips.",
+  "Create an event and return the URL (admin page) for the event page. This page can be used to coordinate schedules and confirm attendance for events such as drinking parties, company events, outdoor activities, and trips. The generated URL has an expiration date, so please encourage the user to open and verify it promptly. After opening, the user should share it with others. When the URL is opened, there is a sharing feature that prompts participants to fill in their attendance.",
   {
     title: z.string().min(1).max(50).describe("Event title"),
     description: z.string().max(1000).describe("Event description"),
@@ -34,8 +34,6 @@ server.tool(
   },
   async ({ title, description, options }) => {
     try {
-      const body = JSON.stringify({ title, description, options });
-
       try {
         const res = await axios.post(
           `${API_DOMAIN}/api/public/v1/events`,
