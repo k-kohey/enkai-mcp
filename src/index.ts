@@ -46,7 +46,10 @@ server.tool(
         );
 
         const data = res.data;
-        const params = new URLSearchParams({ token: data.token });
+        const params = new URLSearchParams({
+          token: data.token,
+          "event-id": data.id,
+        });
         const redirectUrl = `${API_DOMAIN}/auth/event-admin?${params.toString()}`;
         return {
           content: [
