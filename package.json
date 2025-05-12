@@ -1,6 +1,6 @@
 {
 	"name": "enkai-mcp",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "An MCP server for seamless event scheduling on enkai-ai.com.",
 	"repository": {
       "type": "git",
