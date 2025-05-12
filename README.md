@@ -8,11 +8,13 @@ An MCP server for seamless event scheduling on [EnkAI](https://www.enkai-ai.com/
 
 ## Get Started
 
-To use this MCP server in your project, install it via npm:
+To debug this MCP server in your local environment:
 
 ```bash
-npm install enkai-mcp
-npm build
+git clone https://github.com/k-kohey/enkai-mcp
+cd enkai-mcp
+npm install
+npm run build
 ```
 
 ## Usage
