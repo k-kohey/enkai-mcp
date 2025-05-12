@@ -3,24 +3,23 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { server } from "./index.js";
 import { vi } from "vitest";
-import { API_DOMAIN } from "./config.js";
+import * as api from "./api.js";
 
-// API_DOMAINをモック
-vi.mock("./config.js", () => ({
-  API_DOMAIN: "https://example.com",
+// APIモジュールをモック
+vi.mock("./api.js", () => ({
+  createEvent: vi.fn().mockResolvedValue({
+    id: "test-event-id",
+    token: "dummy-token",
+  }),
+  generateEventAdminUrl: vi
+    .fn()
+    .mockReturnValue(
+      "https://example.com/auth/event-admin?token=dummy-token&event-id=test-event-id"
+    ),
 }));
 
 describe("createEventPage", () => {
   it("イベント作成APIを叩き、そのURLを返す", async () => {
-    // axiosをモック
-    vi.mock("axios", () => ({
-      default: {
-        post: vi.fn().mockResolvedValue({
-          data: { id: "test-event-id", adminToken: "dummy-token" },
-        }),
-      },
-    }));
-
     const client = new Client({
       name: "test client",
       version: "0.1.0",
@@ -40,19 +39,25 @@ describe("createEventPage", () => {
       },
     });
 
-    const params = new URLSearchParams({
-      event_id: "test-event-id",
-      admin_token: "dummy-token",
-      redirect_url: "/events/test-event-id/edit",
-    });
+    // createEventが正しい引数で呼ばれたことを確認
+    expect(api.createEvent).toHaveBeenCalledWith(
+      "テストイベント",
+      "テスト用イベントです",
+      [{ startAt: "2023-12-25T15:00:00.000Z", hasTime: true }]
+    );
 
-    const expectedRedirectUrl = `${API_DOMAIN}/auth/event-admin?${params.toString()}`;
+    // generateEventAdminUrlが正しい引数で呼ばれたことを確認
+    expect(api.generateEventAdminUrl).toHaveBeenCalledWith(
+      "test-event-id",
+      "dummy-token"
+    );
 
+    // 結果が期待通りであることを確認
     expect(result).toEqual({
       content: [
         {
           type: "text",
-          text: `Event management page: ${encodeURI(expectedRedirectUrl)}`,
+          text: "Event management page: https://example.com/auth/event-admin?token=dummy-token&event-id=test-event-id",
         },
       ],
     });

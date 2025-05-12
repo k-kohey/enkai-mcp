@@ -1,14 +1,12 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import axios from "axios";
+import { z } from "zod";
+import { getMonthDateToDayNameMap, getCurrentDate } from "./date-helpers.js";
+import { createEvent, generateEventAdminUrl } from "./api.js";
 
 export const server = new McpServer({
   name: "EnkAI",
   version: "0.1.0",
 });
-
-import { z } from "zod";
-import { API_DOMAIN } from "./config.js";
-import { getMonthDateToDayNameMap, getCurrentDate } from "./date-helpers.js";
 
 server.tool(
   "createEventPage",
@@ -35,22 +33,9 @@ server.tool(
   async ({ title, description, options }) => {
     try {
       try {
-        const res = await axios.post(
-          `${API_DOMAIN}/api/public/v1/events`,
-          { title, description, options },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const data = await createEvent(title, description, options);
+        const redirectUrl = generateEventAdminUrl(data.id, data.token);
 
-        const data = res.data;
-        const params = new URLSearchParams({
-          token: data.token,
-          "event-id": data.id,
-        });
-        const redirectUrl = `${API_DOMAIN}/auth/event-admin?${params.toString()}`;
         return {
           content: [
             {
